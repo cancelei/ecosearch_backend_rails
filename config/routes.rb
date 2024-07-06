@@ -11,12 +11,10 @@ Rails.application.routes.draw do
 
   namespace :api do
     namespace :v1 do
-      get 'csrf', to: 'csrf#index'
-
       resources :search, only: [:index] do
         collection do
+          post '/', to: 'search#index'
           get 'results'
-          post 'index'
         end
       end
     end
