@@ -3,6 +3,7 @@ require "active_support/core_ext/integer/time"
 Rails.application.configure do
   config.session_store :cookie_store, key: '_my_api_app_session', same_site: :lax
   config.api_only = false
+  config.good_job.execution_mode = :async
   # Settings specified here will take precedence over those in config/application.rb.
 
   # In the development environment your application's code is reloaded any time

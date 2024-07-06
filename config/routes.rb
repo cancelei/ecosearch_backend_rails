@@ -12,6 +12,12 @@ Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
       get 'csrf', to: 'csrf#index'
+
+      resources :search, only: [:index] do
+        collection do
+          get 'results'
+        end
+      end
     end
   end
 end

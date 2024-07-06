@@ -34,5 +34,7 @@ module AuthApp
     config.middleware.use ActionDispatch::Session::CookieStore
     config.action_dispatch.cookies_same_site_protection = :lax
 
+    config.active_job.queue_adapter = :good_job
+
   end
 end
