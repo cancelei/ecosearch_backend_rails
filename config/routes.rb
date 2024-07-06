@@ -5,7 +5,7 @@ Rails.application.routes.draw do
 
   namespace :api do
     namespace :v1 do
-      # Define your routes here
+      get 'csrf', to: 'csrf#index'
     end
   end
 end
