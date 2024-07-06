@@ -4,8 +4,9 @@ require_relative '../../services/google_search_service'
 require_relative '../../services/bing_search_service'
 require_relative '../../services/brave_search_service'
 
-class Api::V1::SearchController < ApplicationController
-  skip_before_action :verify_authenticity_token
+class Api::V1::SearchController < BaseController
+  skip_before_action :verify_authenticity_token, only: [:index, :results]
+  skip_before_action :authenticate_user!, only: [:index, :results]
 
   def index
     if params[:query].present?
@@ -39,7 +40,7 @@ class Api::V1::SearchController < ApplicationController
 
       render json: { job_id: job.job_id }, status: :accepted
     else
-      render json: { error: 'Query parameter is missing' }, status: :unprocessable_entity
+      # render json: { error: 'Query parameter is missing' }, status: :unprocessable_entity
     end
   end
 

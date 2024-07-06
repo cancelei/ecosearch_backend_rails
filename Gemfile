@@ -18,6 +18,11 @@ gem 'pg', '~> 1.2'
 # GoodJob for background job processing
 gem 'good_job'
 
+# Gemfile
+
+gem 'httparty'
+
+
 # Use the Puma web server [https://github.com/puma/puma]
 gem "puma", ">= 5.0"
 
