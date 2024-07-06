@@ -1,68 +1,82 @@
 # app/controllers/api/v1/search_controller.rb
-
 require_relative '../../services/google_search_service'
 require_relative '../../services/bing_search_service'
 require_relative '../../services/brave_search_service'
 
 module Api
   module V1
-    class SearchController < BaseController
-      skip_before_action :verify_authenticity_token, only: [:index, :results]
-      skip_before_action :authenticate_user!, only: [:index, :results]
+    class SearchController < ApplicationController
+      skip_before_action :verify_authenticity_token, only: [:search]
+      # skip_before_action :authenticate_user!, only: [:search, :index]
 
       def index
-        if params[:query].present?
-          job = case params[:search_engine]
-                when 'google'
-                  GoogleSearchJob.perform_later(
-                    query: params[:query],
-                    num: params[:count].presence || 10,
-                    safesearch: params[:safesearch].presence || 'off'
-                  )
-                when 'bing'
-                  BingSearchJob.perform_later(
-                    query: params[:query],
-                    count: params[:count].presence || 10,
-                    mkt: params[:mkt],
-                    safesearch: params[:safesearch],
-                    freshness: params[:freshness],
-                    sortby: params[:sortby]
-                  )
-                when 'brave'
-                  BraveSearchJob.perform_later(
-                    query: params[:query],
-                    country: params[:country] || 'us',
-                    search_lang: params[:search_lang] || 'en',
-                    ui_lang: params[:ui_lang] || 'en-US',
-                    count: params[:count].presence || 20,
-                    offset: params[:offset].presence || 0,
-                    safesearch: params[:safesearch].presence || 'moderate'
-                  )
-                end
-
-          render json: { job_id: job.job_id }, status: :accepted
+        if params[:job_id].present?
+          handle_get_request
         else
-          # render json: { error: 'Query parameter is missing' }, status: :unprocessable_entity
+          render json: { error: 'job_id parameter is required, use search/search for POST than GET requests' }, status: :bad_request
         end
       end
 
-      def results
-        raw_results = fetch_results(params[:job_id])
-        search_engine = SearchResult.find_by(job_id: params[:job_id])&.search_engine
-
-        formatted_results = case search_engine
-                            when 'google'
-                              format_google_results(raw_results)
-                            when 'bing'
-                              format_bing_results(raw_results)
-                            when 'brave'
-                              format_brave_results(raw_results)
-                            end
-
-        render json: { results: formatted_results }
+      def search
+        if request.get?
+          handle_get_request
+        else
+          handle_post_request
+        end
       end
 
       private
+
+      def handle_post_request
+        if params[:query].present? && params[:search_engine].present?
+          job_id = initiate_search_job(params[:search_engine], params[:query], params[:count], params[:safesearch])
+          if job_id
+            render json: { job_id: job_id }, status: :accepted
+          else
+            render json: { error: 'Invalid search engine' }, status: :unprocessable_entity
+          end
+        else
+          render json: { error: 'Query or search_engine parameter is missing' }, status: :unprocessable_entity
+        end
+      end
+
+      def handle_get_request
+        raw_results = fetch_results(params[:job_id])
+        search_result = SearchResult.find_by(job_id: params[:job_id])
+
+        if search_result
+          search_engine = search_result.search_engine
+
+          formatted_results = case search_engine
+                              when 'google'
+                                format_google_results(raw_results)
+                              when 'bing'
+                                format_bing_results(raw_results)
+                              when 'brave'
+                                format_brave_results(raw_results)
+                              else
+                                []
+                              end
+
+          render json: { results: formatted_results }, status: :ok
+        else
+          render json: { error: 'No search results found for the given job ID' }, status: :not_found
+        end
+      end
+
+      def initiate_search_job(search_engine, query, count, safesearch)
+        job = case search_engine
+              when 'google'
+                GoogleSearchJob.perform_later(query: query, num: count.presence || 10, safesearch: safesearch.presence || 'off')
+              when 'bing'
+                BingSearchJob.perform_later(query: query, count: count.presence || 10, safesearch: safesearch)
+              when 'brave'
+                BraveSearchJob.perform_later(query: query, count: count.presence || 20, safesearch: safesearch.presence || 'moderate')
+              else
+                nil
+              end
+        job.job_id if job
+      end
 
       def fetch_results(job_id)
         SearchResult.where(job_id: job_id).pluck(:results).map { |result| JSON.parse(result) }

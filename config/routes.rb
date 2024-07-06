@@ -11,10 +11,10 @@ Rails.application.routes.draw do
 
   namespace :api do
     namespace :v1 do
-      resources :search, only: [:index] do
+      resource :search, only: [:index], controller: 'search' do
         collection do
-          post '/', to: 'search#index'
-          get 'results'
+          post :search
+          get :search
         end
       end
     end
