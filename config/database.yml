@@ -12,14 +12,13 @@ default: &default
 
 development:
   <<: *default
-  database: auth_app_development
+  database: ecosearch_development
 
 test:
   <<: *default
-  database: auth_app_test
+  database: ecosearch_test
 
 production:
   <<: *default
-  database: auth_app_production
-  username: auth_app
-  password: <%= ENV['AUTH_APP_DATABASE_PASSWORD'] %>
+  database: ecosearch
+  url: <%= ENV['DATABASE_URL'] %>
