@@ -3,7 +3,7 @@ class GoogleSearchJob < ApplicationJob
   queue_as :default
 
   def perform(query:, num:, safesearch:)
-    google_service = GoogleSearchService.new
+    google_service = Services::GoogleSearchService.new
     results = google_service.search(query, num: num, safesearch: safesearch)
     store_results(query, results)
   end
