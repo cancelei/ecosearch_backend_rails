@@ -1,6 +1,6 @@
 source "https://rubygems.org"
 
-ruby "3.2.4"
+ruby "3.3.0"
 gem 'devise'
 gem 'rack-cors'
 
