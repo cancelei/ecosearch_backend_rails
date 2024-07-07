@@ -1,7 +1,7 @@
 # app/services/brave_search_service.rb
 require 'httparty'
 
-class BraveSearchService
+class Services::BraveSearchService
   include HTTParty
   base_uri 'https://api.search.brave.com/res/v1/web'
 

@@ -1,7 +1,7 @@
 # app/services/bing_search_service.rb
 require 'httparty'
 
-class BingSearchService
+class Services::BingSearchService
   include HTTParty
   base_uri 'https://api.bing.microsoft.com/v7.0'
 
