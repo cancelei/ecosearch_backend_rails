@@ -3,25 +3,38 @@ require_relative '../../services/google_search_service'
 require_relative '../../services/bing_search_service'
 require_relative '../../services/brave_search_service'
 
+# Documentation:
+# SearchController is responsible for handling search requests.
+# It can handle both GET and POST requests.
+# GET request will return the search results.
+# POST request will initiate the search job.
+# The search job will be performed by the respective search engine service.
+# The search results will be stored in the database.
+# GET request will fetch the search results from the database and format them.
+# The formatted results will be returned as JSON response.
+# The search engine services are GoogleSearchService, BingSearchService, and BraveSearchService.
+# The search engine services will perform the search and return the results.
+# The search engine services will be called by the respective job classes.
+# The job classes are GoogleSearchJob, BingSearchJob, and BraveSearchJob.
+# The job classes will be called by the SearchController.
+# The search results will be stored in the SearchResult model.
+# The SearchResult model will store the search results in JSON format.
+# The search results will be formatted by the SearchController.
+# The formatted results will be returned as JSON response.
+# The search results will be displayed in the frontend.
+# The frontend will display the search results in a user-friendly manner.
+# The frontend will be developed using React.js.
 module Api
   module V1
     class SearchController < ApplicationController
       skip_before_action :verify_authenticity_token, only: [:search]
-      # skip_before_action :authenticate_user!, only: [:search, :index]
-
-      def index
-        if params[:job_id].present?
-          handle_get_request
-        else
-          render json: { error: 'job_id parameter is required, use search/search for POST than GET requests' }, status: :bad_request
-        end
-      end
+      before_action :authenticate_user!, except: [:search]
 
       def search
         if request.get?
-          handle_get_request
+          handle_get_request #2)this will return the search results.
         else
-          handle_post_request
+          handle_post_request #1)this will initiate the search job.
         end
       end
 
@@ -29,14 +42,14 @@ module Api
 
       def handle_post_request
         if params[:query].present? && params[:search_engine].present?
-          job_id = initiate_search_job(params[:search_engine], params[:query], params[:count], params[:safesearch])
+          job_id = initiate_search_job(params[:search_engine], params[:query], params[:count], params[:safesearch]) #this will initiate the search job.
           if job_id
-            render json: { job_id: job_id }, status: :accepted
+            render json: { job_id: job_id }, status: :accepted #this will show the job_id for the GET request.
           else
             render json: { error: 'Invalid search engine' }, status: :unprocessable_entity
           end
         else
-          render json: { error: 'Query or search_engine parameter is missing' }, status: :unprocessable_entity
+          render json: { error: 'Query and/or search_engine parameter is missing' }, status: :unprocessable_entity
         end
       end
 
@@ -66,6 +79,7 @@ module Api
 
       def initiate_search_job(search_engine, query, count, safesearch)
         job = case search_engine
+              #one of these will be performed, according to the search engine from the POST request.
               when 'google'
                 GoogleSearchJob.perform_later(query: query, num: count.presence || 10, safesearch: safesearch.presence || 'off')
               when 'bing'
@@ -78,9 +92,15 @@ module Api
         job.job_id if job
       end
 
+      # fetch_results is part of GET request.
       def fetch_results(job_id)
         SearchResult.where(job_id: job_id).pluck(:results).map { |result| JSON.parse(result) }
       end
+
+      # format_****_results & _items are part of GET request, they just format the results.
+      # Ex: format_google_results will format the results from Google.
+      # Ex: format_google_items will format the items from Google.
+      #
 
       def format_google_results(results)
         results.map do |parsed_result|

@@ -11,7 +11,7 @@ Rails.application.routes.draw do
 
   namespace :api do
     namespace :v1 do
-      resource :search, only: [:index], controller: 'search' do
+      resource controller: 'search' do
         collection do
           post :search
           get :search
