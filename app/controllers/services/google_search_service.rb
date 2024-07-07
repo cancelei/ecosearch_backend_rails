@@ -1,7 +1,7 @@
-Services::# app/services/google_search_service.rb
+# app/services/google_search_service.rb
 require 'httparty'
 
-class Services::GoogleSearchService
+class GoogleSearchService
   include HTTParty
   base_uri 'https://www.googleapis.com/customsearch/v1'
 
