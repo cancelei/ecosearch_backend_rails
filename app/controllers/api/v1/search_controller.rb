@@ -1,8 +1,5 @@
 # app/controllers/api/v1/search_controller.rb
-require_relative '../../services/google_search_service'
-require_relative '../../services/bing_search_service'
-require_relative '../../services/brave_search_service'
-
+#
 # Documentation:
 # SearchController is responsible for handling search requests.
 # It can handle both GET and POST requests.
