@@ -4,6 +4,8 @@ This repo is backend only. The APIs available are documented here:
 
 https://documenter.getpostman.com/view/28333906/2sA3e1BAFS
 
+Front-end built using React.
+
 ## Installation
 
 1. Clone the repo
