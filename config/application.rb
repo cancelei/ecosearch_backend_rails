@@ -16,6 +16,9 @@ module AuthApp
     # Common ones are `templates`, `generators`, or `middleware`, for example.
     config.autoload_lib(ignore: %w(assets tasks))
 
+    # Add custom directories to autoload paths
+    config.autoload_paths += %W(#{config.root}/app/services)
+
     # Configuration for the application, engines, and railties goes here.
     #
     # These settings can be overridden in specific environments using the files
@@ -33,6 +36,8 @@ module AuthApp
     config.middleware.use ActionDispatch::Cookies
     config.middleware.use ActionDispatch::Session::CookieStore
     config.action_dispatch.cookies_same_site_protection = :lax
+
+    config.active_job.queue_adapter = :good_job
 
   end
 end

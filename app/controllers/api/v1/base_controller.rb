@@ -8,11 +8,6 @@ module Api
       def json_request?
         request.format.json?
       end
-
-      # Example action
-      def index
-        render json: { message: "Welcome to the API" }
-      end
     end
   end
 end
