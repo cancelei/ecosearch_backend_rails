@@ -28,7 +28,14 @@ class BraveSearchService
       safesearch: options[:safesearch] || 'moderate'
     }.compact
 
+    Rails.logger.info("BraveSearchService Request URL: #{self.class.base_uri}")
+    Rails.logger.info("BraveSearchService Request Headers: #{headers}")
+    Rails.logger.info("BraveSearchService Request Options: #{options}")
+
     response = self.class.get('', query: options, headers: headers)
+    Rails.logger.info("BraveSearchService Response Code: #{response.code}")
+    Rails.logger.info("BraveSearchService Response Body: #{response.body}")
+
     JSON.parse(response.body)
   end
 end
