@@ -16,7 +16,9 @@ class BraveSearchService
       "X-Subscription-Token" => @api_key
     }
 
-    params = {
+    options = options.transform_values(&:presence).compact
+
+    options = {
       q: query,
       country: options[:country] || 'us',
       search_lang: options[:search_lang] || 'en',
@@ -26,18 +28,7 @@ class BraveSearchService
       safesearch: options[:safesearch] || 'moderate'
     }.compact
 
-    # Log the params for debugging
-    Rails.logger.info "Sending request to Brave API with params: #{params}"
-
-    # Send the request and log the response
-    response = self.class.get('', query: params, headers: headers)
-    Rails.logger.info "Received response from Brave API: #{response.body}"
-
-    # Check for errors in the response
-    if response.code != 200
-      Rails.logger.error "Error response from Brave API: #{response.body}"
-    end
-
-    response.parsed_response
+    response = self.class.get('', query: options, headers: headers)
+    JSON.parse(response.body)
   end
 end
