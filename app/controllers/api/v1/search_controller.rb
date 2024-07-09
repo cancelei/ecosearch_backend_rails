@@ -80,7 +80,7 @@ module Api
               when 'google'
                 GoogleSearchJob.perform_later(query: query, num: count.presence || 10, safesearch: safesearch.presence || 'off')
               when 'bing'
-                BingSearchJob.perform_later(query: query, count: count.presence || 10, safesearch: safesearch)
+                BingSearchJob.perform_later(query: query, count: count.presence || 10, safesearch: safesearch, mkt: 'en-US', freshness: 'Day', sortby: 'Relevance')
               when 'brave'
                 BraveSearchJob.perform_later(query: query, count: count.presence || 20, safesearch: safesearch.presence || 'moderate')
               else
