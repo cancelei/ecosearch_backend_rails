@@ -18,7 +18,6 @@ class BraveSearchService
 
     params = {
       q: query,
-      key: @api_key,
       country: options[:country] || 'us',
       search_lang: options[:search_lang] || 'en',
       ui_lang: options[:ui_lang] || 'en-US',
@@ -30,8 +29,14 @@ class BraveSearchService
     # Log the params for debugging
     Rails.logger.info "Sending request to Brave API with params: #{params}"
 
+    # Send the request and log the response
     response = self.class.get('', query: params, headers: headers)
     Rails.logger.info "Received response from Brave API: #{response.body}"
+
+    # Check for errors in the response
+    if response.code != 200
+      Rails.logger.error "Error response from Brave API: #{response.body}"
+    end
 
     response.parsed_response
   end
