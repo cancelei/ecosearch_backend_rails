@@ -16,8 +16,7 @@ class BraveSearchService
       "X-Subscription-Token" => @api_key
     }
 
-    options = options.transform_values(&:presence).compact
-
+    # Ensure that options hash includes all necessary keys with defaults if they are not provided
     params = {
       q: query,
       key: @api_key,
@@ -27,8 +26,9 @@ class BraveSearchService
       count: options[:count] || 20,
       offset: options[:offset] || 0,
       safesearch: options[:safesearch] || 'moderate'
-    }.compact
+    }
 
-    self.class.get('/search', query: params, headers: headers)
+    response = self.class.get('', query: params, headers: headers)
+    response.parsed_response
   end
 end
