@@ -12,30 +12,39 @@ class BraveSearchService
   def search(query, options = {})
     headers = {
       "Accept" => "application/json",
-      "User-Agent" => "Mozilla/5.0",
+      "User-Agent" => "Mozilla/5.0 (Macintosh; Intel Mac OS X 13_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36",
       "X-Subscription-Token" => @api_key
     }
 
     options = options.transform_values(&:presence).compact
 
-    options = {
+    # Minimal set of options for validation
+    options.merge!({
       q: query,
+      key: @api_key,
       country: options[:country] || 'us',
       search_lang: options[:search_lang] || 'en',
       ui_lang: options[:ui_lang] || 'en-US',
       count: options[:count] || 20,
       offset: options[:offset] || 0,
       safesearch: options[:safesearch] || 'moderate'
-    }.compact
+    })
 
-    Rails.logger.info("BraveSearchService Request URL: #{self.class.base_uri}")
-    Rails.logger.info("BraveSearchService Request Headers: #{headers}")
-    Rails.logger.info("BraveSearchService Request Options: #{options}")
-
-    response = self.class.get('', query: options, headers: headers)
-    Rails.logger.info("BraveSearchService Response Code: #{response.code}")
-    Rails.logger.info("BraveSearchService Response Body: #{response.body}")
-
-    JSON.parse(response.body)
+    # Brave has a sophisticated API, that is why I placed comprehensive testing for potential errors during adjustments.
+    Rails.logger.debug "Brave API Request Options: #{options.inspect}"
+    begin
+      response = self.class.get('/search', query: options, headers: headers)
+      Rails.logger.debug "Brave API Response: #{response.inspect}"
+      response
+    rescue SocketError => e
+      Rails.logger.error "BraveSearchService SocketError: #{e.message}"
+      nil
+    rescue HTTParty::Error => e
+      Rails.logger.error "BraveSearchService HTTP Error: #{e.message}"
+      nil
+    rescue StandardError => e
+      Rails.logger.error "BraveSearchService Error: #{e.message}"
+      nil
+    end
   end
 end
