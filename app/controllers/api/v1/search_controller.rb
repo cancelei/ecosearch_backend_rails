@@ -82,7 +82,8 @@ module Api
               when 'bing'
                 BingSearchJob.perform_later(query: query, count: count.presence || 10, safesearch: safesearch, mkt: 'en-US', freshness: 'Day', sortby: 'Relevance')
               when 'brave'
-                BraveSearchJob.perform_later(query: query, count: count.presence || 20, safesearch: safesearch.presence || 'moderate')
+                # query:, country:, search_lang:, ui_lang:, count:, offset:, safesearch:
+                BraveSearchJob.perform_later(query: query, count: count.presence || 20, safesearch: safesearch.presence || 'moderate', country: 'US', search_lang: 'en', ui_lang: 'en', offset: 0)
               else
                 nil
               end
