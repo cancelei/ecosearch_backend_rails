@@ -16,7 +16,6 @@ class BraveSearchService
       "X-Subscription-Token" => @api_key
     }
 
-    # Ensure that options hash includes all necessary keys with defaults if they are not provided
     params = {
       q: query,
       key: @api_key,
@@ -26,9 +25,14 @@ class BraveSearchService
       count: options[:count] || 20,
       offset: options[:offset] || 0,
       safesearch: options[:safesearch] || 'moderate'
-    }
+    }.compact
+
+    # Log the params for debugging
+    Rails.logger.info "Sending request to Brave API with params: #{params}"
 
     response = self.class.get('', query: params, headers: headers)
+    Rails.logger.info "Received response from Brave API: #{response.body}"
+
     response.parsed_response
   end
 end
