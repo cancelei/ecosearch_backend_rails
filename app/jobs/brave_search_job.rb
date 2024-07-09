@@ -2,15 +2,15 @@
 class BraveSearchJob < ApplicationJob
   queue_as :default
 
-  def perform(query:, country:, search_lang:, ui_lang:, count:, offset:, safesearch:)
+  def perform(query:, country: 'us', search_lang: 'en', ui_lang: 'en-US', count: 20, offset: 0, safesearch: 'moderate')
     brave_service = BraveSearchService.new
     options = {
-      country: country || 'US',
-      search_lang: search_lang || 'en',
-      ui_lang: ui_lang || 'en',
-      count: count || 20,
-      offset: offset || 0,
-      safesearch: safesearch || 'moderate'
+      country: country,
+      search_lang: search_lang,
+      ui_lang: ui_lang,
+      count: count,
+      offset: offset,
+      safesearch: safesearch
     }
     results = brave_service.search(query, options)
     store_results(query, results)

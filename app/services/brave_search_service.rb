@@ -18,7 +18,7 @@ class BraveSearchService
 
     options = options.transform_values(&:presence).compact
 
-    options.merge!({
+    options = {
       q: query,
       key: @api_key,
       country: options[:country] || 'us',
@@ -27,7 +27,7 @@ class BraveSearchService
       count: options[:count] || 20,
       offset: options[:offset] || 0,
       safesearch: options[:safesearch] || 'moderate'
-    })
+  }.compact
 
     self.class.get('/search', query: options, headers: headers)
   end
