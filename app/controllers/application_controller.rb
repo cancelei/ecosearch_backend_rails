@@ -11,7 +11,7 @@ class ApplicationController < ActionController::API
 
   def authenticate_user!
     # Custom authentication logic
-    redirect_to login_path unless current_user
+    head :forbidden unless current_user
   end
 
   def current_user
@@ -22,6 +22,7 @@ class ApplicationController < ActionController::API
   def set_csrf_cookie
     cookies["CSRF-TOKEN"] = {
       value: form_authenticity_token,
+      httponly: true,
       secure: Rails.env.production?
     }
   end

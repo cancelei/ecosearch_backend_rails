@@ -6,7 +6,14 @@ class SessionsController < Devise::SessionsController
     set_flash_message!(:notice, :signed_in)
     sign_in(resource_name, resource)
     yield resource if block_given?
-    respond_with resource, location: after_sign_in_path_for(resource)
+
+    cookies[:auth_token] = {
+      value: form_authenticity_token,
+      httponly: true,
+      secure: Rails.env.production?
+    }
+
+    render json: { user: resource, csrf_token: form_authenticity_token }, status: :ok
   end
 
   def destroy
