@@ -7,7 +7,7 @@ class SessionsController < Devise::SessionsController
     sign_in(resource_name, resource)
     yield resource if block_given?
 
-    cookies[:auth_token] = {
+    cookies["X-CSRF-Token"] = {
       value: form_authenticity_token,
       httponly: true,
       secure: Rails.env.production?

@@ -3,7 +3,7 @@ class ApplicationController < ActionController::API
   include ActionController::Cookies
   include Devise::Controllers::Helpers
 
-  protect_from_forgery with: :null_session
+  protect_from_forgery with: :exception
 
   before_action :set_csrf_cookie
 
@@ -20,10 +20,11 @@ class ApplicationController < ActionController::API
   end
 
   def set_csrf_cookie
-    cookies["CSRF-TOKEN"] = {
+    cookies["X-CSRF-Token"] = {
       value: form_authenticity_token,
       httponly: true,
       secure: Rails.env.production?
     }
+    response.set_header('X-CSRF-Token', form_authenticity_token) if request.format.json?
   end
 end
